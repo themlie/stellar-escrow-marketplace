@@ -1,15 +1,22 @@
-import { useState } from "react";
-import { getContractClient, NATIVE_TOKEN_ID, stroopsToXlm } from "../lib/stellarClient";
+import { useEffect, useState } from "react";
+import { getContractClient, NATIVE_TOKEN_ID, xlmToStroops } from "../lib/stellarClient";
+import { fetchContentCatalog, type CatalogItem } from "../lib/catalog";
 import { sha256OfFile, bufferToHex, hexToBuffer } from "../lib/hash";
 import { useTxRunner } from "../hooks/useTxRunner";
 import { StatusPill, TxResult } from "./StatusPill";
 import { MaterialIcon } from "./MaterialIcon";
 
-export function BuyerPanel({ address }: { address: string | null }) {
-  const [contentHash, setContentHash] = useState("");
-  const [lookupPrice, setLookupPrice] = useState<string | null>(null);
-  const [lookupError, setLookupError] = useState<string | null>(null);
+function short(addr: string) {
+  return `${addr.slice(0, 4)}…${addr.slice(-4)}`;
+}
 
+export function BuyerPanel({ address }: { address: string | null }) {
+  const [catalog, setCatalog] = useState<CatalogItem[]>([]);
+  const [catalogLoading, setCatalogLoading] = useState(false);
+  const [catalogError, setCatalogError] = useState<string | null>(null);
+  const [buyingHash, setBuyingHash] = useState<string | null>(null);
+
+  const [contentHash, setContentHash] = useState("");
   const [receivedFile, setReceivedFile] = useState<File | null>(null);
   const [verifyResult, setVerifyResult] = useState<"match" | "mismatch" | null>(null);
 
@@ -17,33 +24,37 @@ export function BuyerPanel({ address }: { address: string | null }) {
   const releaseTx = useTxRunner<void>();
   const refundTx = useTxRunner<void>();
 
-  async function handleLookup() {
+  useEffect(() => {
     if (!address) return;
-    setLookupError(null);
-    setLookupPrice(null);
-    const client = getContractClient(address);
-    try {
-      const assembled = await client.get_content({ content_hash: hexToBuffer(contentHash) });
-      const result = assembled.result as { isErr(): boolean; unwrapErr(): { message: string }; unwrap(): { price: bigint } };
-      if (result.isErr()) {
-        setLookupError(result.unwrapErr().message);
-        return;
-      }
-      setLookupPrice(stroopsToXlm(result.unwrap().price));
-    } catch (e) {
-      setLookupError(e instanceof Error ? e.message : String(e));
-    }
-  }
+    let cancelled = false;
+    setCatalogLoading(true);
+    setCatalogError(null);
+    fetchContentCatalog(address)
+      .then((items) => {
+        if (!cancelled) setCatalog(items);
+      })
+      .catch((e) => {
+        if (!cancelled) setCatalogError(e instanceof Error ? e.message : String(e));
+      })
+      .finally(() => {
+        if (!cancelled) setCatalogLoading(false);
+      });
+    return () => {
+      cancelled = true;
+    };
+  }, [address]);
 
-  async function handleCreateEscrow() {
-    if (!address || !lookupPrice) return;
+  async function handleBuy(item: CatalogItem) {
+    if (!address) return;
+    setBuyingHash(item.contentHash);
+    setContentHash(item.contentHash);
     await escrowTx.run(async () => {
       const client = getContractClient(address);
       return client.create_escrow({
         buyer: address,
-        content_hash: hexToBuffer(contentHash),
+        content_hash: hexToBuffer(item.contentHash),
         token: NATIVE_TOKEN_ID,
-        amount: BigInt(Math.round(parseFloat(lookupPrice) * 10_000_000)),
+        amount: xlmToStroops(item.price),
       });
     });
   }
@@ -92,49 +103,50 @@ export function BuyerPanel({ address }: { address: string | null }) {
         <h3 className="text-[20px] font-semibold text-on-surface">Alıcı Paneli</h3>
       </div>
 
-      {/* Step 1: search & buy */}
+      {/* Step 1: browse & buy */}
       <div className="flex flex-col gap-6">
         <div className="flex items-center gap-3">
           <div className="step-circle">1</div>
-          <h4 className="font-semibold text-[15px]">İçerik Ara &amp; Satın Al</h4>
+          <h4 className="font-semibold text-[15px]">Satın Alınabilir İçerikler</h4>
         </div>
-        <div className="space-y-4 pl-10">
-          <div className="space-y-1">
-            <label className="text-[12px] font-medium text-on-surface-variant">Content Hash</label>
-            <input
-              className="input-dark w-full rounded-lg px-4 py-3 focus:outline-none"
-              placeholder="64 karakter hex"
-              value={contentHash}
-              onChange={(e) => setContentHash(e.target.value)}
-            />
-          </div>
-          <button
-            className="w-full border border-outline-variant text-on-surface py-3 rounded-xl font-bold hover:border-on-surface transition-all disabled:opacity-50 disabled:cursor-not-allowed"
-            onClick={handleLookup}
-            disabled={!address}
-          >
-            İçeriği Görüntüle
-          </button>
-          {lookupError && (
+        <div className="pl-10 flex flex-col gap-3">
+          {catalogLoading && <p className="text-[13px] text-on-surface-variant">Yükleniyor…</p>}
+          {catalogError && (
             <p className="flex items-center gap-2 text-[12.5px] bg-error/10 border border-error/30 rounded-lg px-3 py-2">
               <MaterialIcon name="error" className="text-error text-[16px]" />
-              {lookupError}
+              Liste yüklenemedi: {catalogError}
             </p>
           )}
-          {lookupPrice && (
-            <>
-              <p className="text-[14px] text-on-surface">
-                Fiyat: <strong className="text-primary">{lookupPrice} XLM</strong>
-              </p>
-              <button
-                className="w-full primary-gradient text-white py-3 rounded-xl font-bold primary-glow transition-all disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:shadow-none"
-                onClick={handleCreateEscrow}
-                disabled={!address || escrowBusy}
-              >
-                Satın Al (Escrow Oluştur)
-              </button>
-            </>
+          {!catalogLoading && !catalogError && catalog.length === 0 && (
+            <p className="text-[13px] text-on-surface-variant">Henüz kayıtlı içerik yok.</p>
           )}
+          {catalog.map((item) => {
+            const isThisBusy = buyingHash === item.contentHash && escrowBusy;
+            return (
+              <div
+                key={item.contentHash}
+                className="bg-surface-container-lowest border border-outline-variant rounded-lg p-3 flex flex-col gap-2"
+              >
+                <div className="flex items-start justify-between gap-3">
+                  <div className="min-w-0">
+                    <div className="text-[13.5px] font-semibold text-on-surface truncate">{item.description}</div>
+                    <div className="text-[11px] font-mono text-on-surface-variant">Satıcı: {short(item.seller)}</div>
+                    <div className="text-[11px] font-mono text-on-surface-variant truncate">
+                      hash: {item.contentHash.slice(0, 10)}…{item.contentHash.slice(-6)}
+                    </div>
+                  </div>
+                  <div className="text-[14px] font-bold text-primary whitespace-nowrap">{item.price} XLM</div>
+                </div>
+                <button
+                  className="w-full primary-gradient text-white py-2 rounded-lg text-[13px] font-bold primary-glow transition-all disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:shadow-none"
+                  onClick={() => handleBuy(item)}
+                  disabled={!address || escrowBusy}
+                >
+                  {isThisBusy ? "İşleniyor…" : "Satın Al (Escrow Oluştur)"}
+                </button>
+              </div>
+            );
+          })}
           <StatusPill stage={escrowTx.stage} />
           <TxResult txHash={escrowTx.txHash} errorMessage={escrowTx.error?.message ?? null} />
         </div>
@@ -148,6 +160,15 @@ export function BuyerPanel({ address }: { address: string | null }) {
         </div>
         <div className="space-y-4 pl-10">
           <div className="space-y-1">
+            <label className="text-[12px] font-medium text-on-surface-variant">Content Hash</label>
+            <input
+              className="input-dark w-full rounded-lg px-4 py-3 focus:outline-none"
+              placeholder="Yukarıdan satın alınca otomatik dolar"
+              value={contentHash}
+              onChange={(e) => setContentHash(e.target.value)}
+            />
+          </div>
+          <div className="space-y-1">
             <label className="text-[12px] font-medium text-on-surface-variant">Teslim Alınan Dosya</label>
             <div className="flex items-center gap-3">
               <label className="cursor-pointer bg-surface-container-highest border border-outline-variant px-4 py-2 rounded-lg text-[12px] text-on-surface hover:bg-surface-bright transition-colors">
@@ -160,7 +181,7 @@ export function BuyerPanel({ address }: { address: string | null }) {
           <button
             className="w-full bg-secondary-container text-on-secondary-container py-3 rounded-xl font-bold transition-all disabled:opacity-50 disabled:cursor-not-allowed"
             onClick={handleVerifyAndRelease}
-            disabled={!address || !receivedFile}
+            disabled={!address || !receivedFile || !contentHash}
           >
             Hash Doğrula ve Ödemeyi Onayla
           </button>
@@ -189,7 +210,7 @@ export function BuyerPanel({ address }: { address: string | null }) {
           <button
             className="w-full border border-error/50 text-error py-3 rounded-xl font-bold hover:bg-error/10 transition-all disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:bg-transparent"
             onClick={handleRefund}
-            disabled={!address || refundBusy}
+            disabled={!address || refundBusy || !contentHash}
           >
             İade Talep Et
           </button>

@@ -58,6 +58,7 @@ export function SellerPanel({ address, prefill }: { address: string | null; pref
 
   const registerBusy = registerTx.stage === "signing" || registerTx.stage === "pending";
   const deliverBusy = deliverTx.stage === "signing" || deliverTx.stage === "pending";
+  const showDeliverStep = !!contentHashHex || !!prefill;
 
   return (
     <section className="glass-panel rounded-xl p-6 md:p-8 flex flex-col gap-8 h-full">
@@ -125,43 +126,49 @@ export function SellerPanel({ address, prefill }: { address: string | null; pref
         </div>
       </div>
 
-      {/* Step 2: mark delivered */}
-      <div className="flex flex-col gap-6">
-        <div className="flex items-center gap-3">
-          <div className="step-circle">2</div>
-          <h4 className="font-semibold text-[15px]">Teslimat İşaretle</h4>
-        </div>
-        <div className="space-y-4 pl-10">
-          <div className="space-y-1">
-            <label className="text-[12px] font-medium text-on-surface-variant">Content Hash</label>
-            <input
-              className="input-dark w-full rounded-lg px-4 py-3 focus:outline-none"
-              placeholder="64 karakter hex"
-              value={contentHashForDelivery}
-              onChange={(e) => setContentHashForDelivery(e.target.value)}
-            />
+      {/* Step 2: mark delivered — only relevant once there's something registered or a pending delivery */}
+      {showDeliverStep ? (
+        <div className="flex flex-col gap-6">
+          <div className="flex items-center gap-3">
+            <div className="step-circle">2</div>
+            <h4 className="font-semibold text-[15px]">Teslimat İşaretle</h4>
           </div>
-          <div className="space-y-1">
-            <label className="text-[12px] font-medium text-on-surface-variant">Alıcı Adresi</label>
-            <input
-              className="input-dark w-full rounded-lg px-4 py-3 focus:outline-none"
-              placeholder="G..."
-              value={buyerForDelivery}
-              onChange={(e) => setBuyerForDelivery(e.target.value)}
-            />
-          </div>
+          <div className="space-y-4 pl-10">
+            <div className="space-y-1">
+              <label className="text-[12px] font-medium text-on-surface-variant">Content Hash</label>
+              <input
+                className="input-dark w-full rounded-lg px-4 py-3 focus:outline-none"
+                placeholder="64 karakter hex"
+                value={contentHashForDelivery}
+                onChange={(e) => setContentHashForDelivery(e.target.value)}
+              />
+            </div>
+            <div className="space-y-1">
+              <label className="text-[12px] font-medium text-on-surface-variant">Alıcı Adresi</label>
+              <input
+                className="input-dark w-full rounded-lg px-4 py-3 focus:outline-none"
+                placeholder="G..."
+                value={buyerForDelivery}
+                onChange={(e) => setBuyerForDelivery(e.target.value)}
+              />
+            </div>
 
-          <button
-            className="w-full border border-primary text-primary py-3 rounded-xl font-bold hover:bg-primary/10 transition-all disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:bg-transparent"
-            onClick={handleMarkDelivered}
-            disabled={!address || deliverBusy}
-          >
-            Teslim Edildi Olarak İşaretle
-          </button>
-          <StatusPill stage={deliverTx.stage} />
-          <TxResult txHash={deliverTx.txHash} errorMessage={deliverTx.error?.message ?? null} />
+            <button
+              className="w-full border border-primary text-primary py-3 rounded-xl font-bold hover:bg-primary/10 transition-all disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:bg-transparent"
+              onClick={handleMarkDelivered}
+              disabled={!address || deliverBusy}
+            >
+              Teslim Edildi Olarak İşaretle
+            </button>
+            <StatusPill stage={deliverTx.stage} />
+            <TxResult txHash={deliverTx.txHash} errorMessage={deliverTx.error?.message ?? null} />
+          </div>
         </div>
-      </div>
+      ) : (
+        <p className="text-[12.5px] text-on-surface-variant pl-10">
+          İçerik kaydettikten sonra (ya da olaylar akışından bir alıcı geldiğinde) burada teslimat işaretleme seçeneği görünecek.
+        </p>
+      )}
     </section>
   );
 }

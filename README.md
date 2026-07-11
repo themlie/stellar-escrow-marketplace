@@ -8,6 +8,45 @@ A smart contract running on Stellar Soroban that enables the secure sale of digi
 
 [![Watch Demo on Loom](https://img.shields.io/badge/▶%20Watch%20Demo-Loom-purple?style=for-the-badge&logo=loom)](https://www.loom.com/share/5ac201f53c6d412d9f55ed3604c28129)
 
+## 🟡 Level 2 Additions (Yellow Belt)
+
+This project was extended to satisfy the Rise In Level 2 requirements: multi-wallet integration, testnet contract deployment, frontend contract calls, live transaction status tracking, and real-time event synchronization.
+
+### Deployed contract (Stellar Testnet)
+
+- **Contract ID**: [`CBBVCK6MLR7HPWWIJOC6IUBPHE337BOEVT2P7PSE2TEVRJHGOWESOPWU`](https://stellar.expert/explorer/testnet/contract/CBBVCK6MLR7HPWWIJOC6IUBPHE337BOEVT2P7PSE2TEVRJHGOWESOPWU)
+- **Deploy transaction**: [`cd0fa265de7dcf0bc597febfd7b53116f525558b97f9c5f17ca59cbd8988cad7`](https://stellar.expert/explorer/testnet/tx/cd0fa265de7dcf0bc597febfd7b53116f525558b97f9c5f17ca59cbd8988cad7)
+- **Example contract call** (`register_content`, verifiable on Stellar Expert): [`d839f8fd90be7e7367a91429118b7e5aaff9d95dfc80535cb2091e4a4085092a`](https://stellar.expert/explorer/testnet/tx/d839f8fd90be7e7367a91429118b7e5aaff9d95dfc80535cb2091e4a4085092a)
+
+### Frontend
+
+A React + TypeScript + Vite app in [`frontend/`](frontend) that talks to the contract above.
+
+**Setup:**
+
+```bash
+cd frontend
+npm install
+npm run dev
+```
+
+Then open `http://localhost:5173`.
+
+**What it implements:**
+
+- **Multi-wallet support** via [StellarWalletsKit](https://stellarwalletskit.dev/) — Freighter, xBull, Albedo, LOBSTR, Rabet, and Hana all appear in the "Connect Wallet" modal (`src/lib/wallet.ts`).
+- **Contract calls from the frontend** using TypeScript bindings generated with `stellar contract bindings typescript` (`packages/rise_in_contract/`, consumed as `rise-in-contract-client` — see `src/components/SellerPanel.tsx` and `src/components/BuyerPanel.tsx`).
+- **Transaction status tracking** (`idle → building → signing → pending → success/error`) shown as a status pill next to every action, with a link to the tx on Stellar Expert (`src/hooks/useTxRunner.ts`, `src/components/StatusPill.tsx`).
+- **3+ handled error types** (`src/lib/errors.ts`):
+  1. **Wallet not found / not selected** — no extension installed or the connect modal was closed.
+  2. **User rejected** — the wallet declined to sign (mapped from the SDK's `UserRejectedError`).
+  3. **Insufficient balance / simulation failure** — caught from `SimulationFailedError` and from the contract's own `Result` errors (e.g. `InvalidPaymentAmount`, `ContentNotFound`), each translated to a human-readable message.
+- **Real-time event synchronization** — polls `server.getEvents()` for this contract and renders a live feed (`content_registered`, `escrow_created`, `content_delivered`, `payment_released`, `refund_issued`) without a page refresh (`src/lib/events.ts`, `src/components/EventFeed.tsx`).
+
+**Screenshot — wallet options available:**
+
+_Run `npm run dev`, click "Cüzdan Bağla", and save the resulting modal (Freighter/xBull/Albedo/LOBSTR/Rabet/Hana) as `screenshots/08-wallet-options.png`. This was verified working during development (all six wallets listed correctly) but could not be captured as an image file in the sandboxed dev environment used to build this feature._
+
 ## 🎯 Project Overview
 
 Rise In is a blockchain solution that provides security and transparency in the sale of digital content (code, documents, data). Files are never uploaded to the blockchain; only their SHA-256 hashes are recorded. This ensures:- ✅ **Privacy**: Content is not visible on the blockchain

@@ -12,7 +12,18 @@ function App() {
     <div className="min-h-screen flex flex-col">
       <header className="sticky top-0 z-50 bg-surface/80 backdrop-blur-md border-b border-outline-variant">
         <div className="flex justify-between items-center px-6 py-4 w-full max-w-[1200px] mx-auto">
-          <h1 className="text-[20px] font-bold text-on-surface">Stellar Marketplace</h1>
+          <div className="flex items-center gap-3">
+            <h1 className="text-[20px] font-bold text-on-surface">Stellar Marketplace</h1>
+            <a
+              href={`https://stellar.expert/explorer/testnet/contract/${CONTRACT_ID}`}
+              target="_blank"
+              rel="noreferrer"
+              className="hidden sm:inline-flex items-center gap-1 px-2.5 py-1 rounded-full bg-surface-container border border-outline-variant text-[11px] font-mono text-on-surface-variant hover:border-primary hover:text-on-surface transition-colors"
+            >
+              Contract: {CONTRACT_ID.slice(0, 6)}…{CONTRACT_ID.slice(-6)}
+              <span className="material-symbols-outlined text-[13px]">open_in_new</span>
+            </a>
+          </div>
           <WalletBar wallet={wallet} />
         </div>
       </header>
@@ -23,15 +34,6 @@ function App() {
           <p className="text-[14px] text-on-surface-variant mt-2">
             Hash tabanlı güvenli dijital içerik satışı · Stellar Soroban
           </p>
-          <a
-            href={`https://stellar.expert/explorer/testnet/contract/${CONTRACT_ID}`}
-            target="_blank"
-            rel="noreferrer"
-            className="inline-flex items-center gap-1.5 mt-3 px-3 py-1.5 rounded-full bg-surface-container border border-outline-variant text-[12px] font-mono text-on-surface-variant hover:border-primary hover:text-on-surface transition-colors"
-          >
-            {CONTRACT_ID.slice(0, 6)}…{CONTRACT_ID.slice(-6)}
-            <span className="material-symbols-outlined text-[14px]">open_in_new</span>
-          </a>
           {!wallet.address && (
             <p className="flex items-center gap-2 mt-4 text-[13px] text-on-surface-variant bg-surface-container-low border border-dashed border-outline-variant rounded-lg px-4 py-3 max-w-fit">
               <span className="material-symbols-outlined text-[18px] text-primary">lock</span>

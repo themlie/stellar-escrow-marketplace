@@ -3,7 +3,7 @@ import { getContractClient, xlmToStroops } from "../lib/stellarClient";
 import { sha256OfFile, sha256OfText, bufferToHex, hexToBuffer } from "../lib/hash";
 import { useTxRunner } from "../hooks/useTxRunner";
 import { StatusPill, TxResult } from "./StatusPill";
-import { TagIcon } from "./icons";
+import { MaterialIcon } from "./MaterialIcon";
 
 export function SellerPanel({ address }: { address: string | null }) {
   const [description, setDescription] = useState("");
@@ -49,66 +49,106 @@ export function SellerPanel({ address }: { address: string | null }) {
   const deliverBusy = deliverTx.stage === "signing" || deliverTx.stage === "pending";
 
   return (
-    <section className="panel">
-      <div className="panel-head seller">
-        <div className="icon-badge">
-          <TagIcon size={18} />
+    <section className="glass-panel rounded-xl p-6 md:p-8 flex flex-col gap-8 h-full">
+      <div className="flex items-center gap-3">
+        <div className="bg-primary/20 p-2 rounded-lg">
+          <MaterialIcon name="store" className="text-primary" />
         </div>
-        <h2>Satıcı Paneli</h2>
+        <h3 className="text-[20px] font-semibold text-on-surface">Satıcı Paneli</h3>
       </div>
 
-      <div className="panel-body">
-        <div className="step">
-          <span className="step-index">1</span>
-          <div className="step-content">
-            <div className="step-title">İçerik Kaydet</div>
-
-            <div className="field">
-              <label>Açıklama</label>
-              <input value={description} onChange={(e) => setDescription(e.target.value)} placeholder="Örn: Premium Kod Paketi" />
-            </div>
-            <div className="field">
-              <label>Fiyat (XLM)</label>
-              <input value={price} onChange={(e) => setPrice(e.target.value)} type="number" min="0" step="0.0000001" />
-            </div>
-            <div className="field">
-              <label>Dosya (opsiyonel — verilmezse açıklama metni hash&apos;lenir)</label>
-              <input type="file" onChange={(e) => setFile(e.target.files?.[0] ?? null)} />
-            </div>
-
-            <button className="btn btn-primary btn-block" onClick={handleRegister} disabled={!address || registerBusy}>
-              İçeriği Kaydet
-            </button>
-            <StatusPill stage={registerTx.stage} />
-            <TxResult txHash={registerTx.txHash} errorMessage={registerTx.error?.message ?? null} />
-            {contentHashHex && (
-              <p className="hash-display">
-                content_hash: <code>{contentHashHex}</code>
-              </p>
-            )}
-          </div>
+      {/* Step 1: register content */}
+      <div className="flex flex-col gap-6">
+        <div className="flex items-center gap-3">
+          <div className="step-circle">1</div>
+          <h4 className="font-semibold text-[15px]">İçerik Kaydet</h4>
         </div>
-
-        <div className="step">
-          <span className="step-index">2</span>
-          <div className="step-content">
-            <div className="step-title">Teslimat İşaretle</div>
-
-            <div className="field">
-              <label>Content Hash</label>
-              <input value={contentHashForDelivery} onChange={(e) => setContentHashForDelivery(e.target.value)} placeholder="64 karakter hex" />
-            </div>
-            <div className="field">
-              <label>Alıcı Adresi</label>
-              <input value={buyerForDelivery} onChange={(e) => setBuyerForDelivery(e.target.value)} placeholder="G..." />
-            </div>
-
-            <button className="btn btn-secondary btn-block" onClick={handleMarkDelivered} disabled={!address || deliverBusy}>
-              Teslim Edildi Olarak İşaretle
-            </button>
-            <StatusPill stage={deliverTx.stage} />
-            <TxResult txHash={deliverTx.txHash} errorMessage={deliverTx.error?.message ?? null} />
+        <div className="space-y-4 pl-10">
+          <div className="space-y-1">
+            <label className="text-[12px] font-medium text-on-surface-variant">Açıklama</label>
+            <input
+              className="input-dark w-full rounded-lg px-4 py-3 focus:outline-none"
+              placeholder="Örn: Premium Kod Paketi"
+              value={description}
+              onChange={(e) => setDescription(e.target.value)}
+            />
           </div>
+          <div className="space-y-1">
+            <label className="text-[12px] font-medium text-on-surface-variant">Fiyat (XLM)</label>
+            <input
+              className="input-dark w-full rounded-lg px-4 py-3 focus:outline-none"
+              type="number"
+              min="0"
+              step="0.0000001"
+              value={price}
+              onChange={(e) => setPrice(e.target.value)}
+            />
+          </div>
+          <div className="space-y-1">
+            <label className="text-[12px] font-medium text-on-surface-variant">
+              Dosya (opsiyonel — verilmezse açıklama metni hash&apos;lenir)
+            </label>
+            <div className="flex items-center gap-3">
+              <label className="cursor-pointer bg-surface-container-highest border border-outline-variant px-4 py-2 rounded-lg text-[12px] text-on-surface hover:bg-surface-bright transition-colors">
+                Dosya Seç
+                <input className="hidden" type="file" onChange={(e) => setFile(e.target.files?.[0] ?? null)} />
+              </label>
+              <span className="text-[13px] text-on-surface-variant truncate">{file?.name ?? "Dosya seçilmedi"}</span>
+            </div>
+          </div>
+
+          <button
+            className="w-full primary-gradient text-white py-3 rounded-xl font-bold primary-glow transition-all disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:shadow-none"
+            onClick={handleRegister}
+            disabled={!address || registerBusy}
+          >
+            İçeriği Kaydet
+          </button>
+          <StatusPill stage={registerTx.stage} />
+          <TxResult txHash={registerTx.txHash} errorMessage={registerTx.error?.message ?? null} />
+          {contentHashHex && (
+            <p className="text-[11px] text-on-surface-variant bg-surface-container-lowest border border-outline-variant rounded-lg px-3 py-2 break-all">
+              content_hash: <code className="text-on-surface">{contentHashHex}</code>
+            </p>
+          )}
+        </div>
+      </div>
+
+      {/* Step 2: mark delivered */}
+      <div className="flex flex-col gap-6">
+        <div className="flex items-center gap-3">
+          <div className="step-circle">2</div>
+          <h4 className="font-semibold text-[15px]">Teslimat İşaretle</h4>
+        </div>
+        <div className="space-y-4 pl-10">
+          <div className="space-y-1">
+            <label className="text-[12px] font-medium text-on-surface-variant">Content Hash</label>
+            <input
+              className="input-dark w-full rounded-lg px-4 py-3 focus:outline-none"
+              placeholder="64 karakter hex"
+              value={contentHashForDelivery}
+              onChange={(e) => setContentHashForDelivery(e.target.value)}
+            />
+          </div>
+          <div className="space-y-1">
+            <label className="text-[12px] font-medium text-on-surface-variant">Alıcı Adresi</label>
+            <input
+              className="input-dark w-full rounded-lg px-4 py-3 focus:outline-none"
+              placeholder="G..."
+              value={buyerForDelivery}
+              onChange={(e) => setBuyerForDelivery(e.target.value)}
+            />
+          </div>
+
+          <button
+            className="w-full border border-primary text-primary py-3 rounded-xl font-bold hover:bg-primary/10 transition-all disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:bg-transparent"
+            onClick={handleMarkDelivered}
+            disabled={!address || deliverBusy}
+          >
+            Teslim Edildi Olarak İşaretle
+          </button>
+          <StatusPill stage={deliverTx.stage} />
+          <TxResult txHash={deliverTx.txHash} errorMessage={deliverTx.error?.message ?? null} />
         </div>
       </div>
     </section>

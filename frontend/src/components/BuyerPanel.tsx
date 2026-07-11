@@ -3,7 +3,7 @@ import { getContractClient, NATIVE_TOKEN_ID, stroopsToXlm } from "../lib/stellar
 import { sha256OfFile, bufferToHex, hexToBuffer } from "../lib/hash";
 import { useTxRunner } from "../hooks/useTxRunner";
 import { StatusPill, TxResult } from "./StatusPill";
-import { CartIcon } from "./icons";
+import { MaterialIcon } from "./MaterialIcon";
 
 export function BuyerPanel({ address }: { address: string | null }) {
   const [contentHash, setContentHash] = useState("");
@@ -84,72 +84,117 @@ export function BuyerPanel({ address }: { address: string | null }) {
   const refundBusy = refundTx.stage === "signing" || refundTx.stage === "pending";
 
   return (
-    <section className="panel">
-      <div className="panel-head buyer">
-        <div className="icon-badge">
-          <CartIcon size={18} />
+    <section className="glass-panel rounded-xl p-6 md:p-8 flex flex-col gap-8 h-full">
+      <div className="flex items-center gap-3">
+        <div className="bg-secondary/20 p-2 rounded-lg">
+          <MaterialIcon name="shopping_cart" className="text-secondary" />
         </div>
-        <h2>Alıcı Paneli</h2>
+        <h3 className="text-[20px] font-semibold text-on-surface">Alıcı Paneli</h3>
       </div>
 
-      <div className="panel-body">
-        <div className="step">
-          <span className="step-index">1</span>
-          <div className="step-content">
-            <div className="step-title">İçerik Ara &amp; Satın Al</div>
-
-            <div className="field">
-              <label>Content Hash</label>
-              <input value={contentHash} onChange={(e) => setContentHash(e.target.value)} placeholder="64 karakter hex" />
-            </div>
-            <button className="btn btn-secondary btn-block" onClick={handleLookup} disabled={!address}>
-              İçeriği Görüntüle
-            </button>
-            {lookupError && <p className="tx-banner error">{lookupError}</p>}
-            {lookupPrice && (
-              <>
-                <p className="result-price">
-                  Fiyat: <strong>{lookupPrice} XLM</strong>
-                </p>
-                <button className="btn btn-primary btn-block" onClick={handleCreateEscrow} disabled={!address || escrowBusy}>
-                  Satın Al (Escrow Oluştur)
-                </button>
-              </>
-            )}
-            <StatusPill stage={escrowTx.stage} />
-            <TxResult txHash={escrowTx.txHash} errorMessage={escrowTx.error?.message ?? null} />
-          </div>
+      {/* Step 1: search & buy */}
+      <div className="flex flex-col gap-6">
+        <div className="flex items-center gap-3">
+          <div className="step-circle">1</div>
+          <h4 className="font-semibold text-[15px]">İçerik Ara &amp; Satın Al</h4>
         </div>
-
-        <div className="step">
-          <span className="step-index">2</span>
-          <div className="step-content">
-            <div className="step-title">Teslimatı Doğrula &amp; Ödemeyi Onayla</div>
-
-            <div className="field">
-              <label>Teslim Alınan Dosya</label>
-              <input type="file" onChange={(e) => setReceivedFile(e.target.files?.[0] ?? null)} />
-            </div>
-            <button className="btn btn-primary btn-block" onClick={handleVerifyAndRelease} disabled={!address || !receivedFile}>
-              Hash Doğrula ve Ödemeyi Onayla
-            </button>
-            {verifyResult === "mismatch" && <p className="inline-msg mismatch">Hash eşleşmedi! İçerik değişmiş olabilir.</p>}
-            {verifyResult === "match" && <p className="inline-msg match">Hash doğrulandı.</p>}
-            <StatusPill stage={releaseTx.stage} />
-            <TxResult txHash={releaseTx.txHash} errorMessage={releaseTx.error?.message ?? null} />
+        <div className="space-y-4 pl-10">
+          <div className="space-y-1">
+            <label className="text-[12px] font-medium text-on-surface-variant">Content Hash</label>
+            <input
+              className="input-dark w-full rounded-lg px-4 py-3 focus:outline-none"
+              placeholder="64 karakter hex"
+              value={contentHash}
+              onChange={(e) => setContentHash(e.target.value)}
+            />
           </div>
+          <button
+            className="w-full border border-outline-variant text-on-surface py-3 rounded-xl font-bold hover:border-on-surface transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+            onClick={handleLookup}
+            disabled={!address}
+          >
+            İçeriği Görüntüle
+          </button>
+          {lookupError && (
+            <p className="flex items-center gap-2 text-[12.5px] bg-error/10 border border-error/30 rounded-lg px-3 py-2">
+              <MaterialIcon name="error" className="text-error text-[16px]" />
+              {lookupError}
+            </p>
+          )}
+          {lookupPrice && (
+            <>
+              <p className="text-[14px] text-on-surface">
+                Fiyat: <strong className="text-primary">{lookupPrice} XLM</strong>
+              </p>
+              <button
+                className="w-full primary-gradient text-white py-3 rounded-xl font-bold primary-glow transition-all disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:shadow-none"
+                onClick={handleCreateEscrow}
+                disabled={!address || escrowBusy}
+              >
+                Satın Al (Escrow Oluştur)
+              </button>
+            </>
+          )}
+          <StatusPill stage={escrowTx.stage} />
+          <TxResult txHash={escrowTx.txHash} errorMessage={escrowTx.error?.message ?? null} />
         </div>
+      </div>
 
-        <div className="step">
-          <span className="step-index">3</span>
-          <div className="step-content">
-            <div className="step-title">Zaman Aşımı İadesi (24 saat sonra)</div>
-            <button className="btn btn-secondary btn-block" onClick={handleRefund} disabled={!address || refundBusy}>
-              İade Talep Et
-            </button>
-            <StatusPill stage={refundTx.stage} />
-            <TxResult txHash={refundTx.txHash} errorMessage={refundTx.error?.message ?? null} />
+      {/* Step 2: verify & release */}
+      <div className="flex flex-col gap-6">
+        <div className="flex items-center gap-3">
+          <div className="step-circle">2</div>
+          <h4 className="font-semibold text-[15px]">Teslimatı Doğrula &amp; Ödemeyi Onayla</h4>
+        </div>
+        <div className="space-y-4 pl-10">
+          <div className="space-y-1">
+            <label className="text-[12px] font-medium text-on-surface-variant">Teslim Alınan Dosya</label>
+            <div className="flex items-center gap-3">
+              <label className="cursor-pointer bg-surface-container-highest border border-outline-variant px-4 py-2 rounded-lg text-[12px] text-on-surface hover:bg-surface-bright transition-colors">
+                Dosya Seç
+                <input className="hidden" type="file" onChange={(e) => setReceivedFile(e.target.files?.[0] ?? null)} />
+              </label>
+              <span className="text-[13px] text-on-surface-variant truncate">{receivedFile?.name ?? "Dosya seçilmedi"}</span>
+            </div>
           </div>
+          <button
+            className="w-full bg-secondary-container text-on-secondary-container py-3 rounded-xl font-bold transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+            onClick={handleVerifyAndRelease}
+            disabled={!address || !receivedFile}
+          >
+            Hash Doğrula ve Ödemeyi Onayla
+          </button>
+          {verifyResult === "mismatch" && (
+            <p className="flex items-center gap-2 text-[12.5px] text-error">
+              <MaterialIcon name="cancel" className="text-[16px]" /> Hash eşleşmedi! İçerik değişmiş olabilir.
+            </p>
+          )}
+          {verifyResult === "match" && (
+            <p className="flex items-center gap-2 text-[12.5px] text-tertiary">
+              <MaterialIcon name="check_circle" className="text-[16px]" /> Hash doğrulandı.
+            </p>
+          )}
+          <StatusPill stage={releaseTx.stage} />
+          <TxResult txHash={releaseTx.txHash} errorMessage={releaseTx.error?.message ?? null} />
+        </div>
+      </div>
+
+      {/* Step 3: refund */}
+      <div className="flex flex-col gap-6">
+        <div className="flex items-center gap-3">
+          <div className="step-circle">3</div>
+          <h4 className="font-semibold text-[15px]">Zaman Aşımı İadesi (24 saat sonra)</h4>
+        </div>
+        <div className="pl-10">
+          <button
+            className="w-full border border-error/50 text-error py-3 rounded-xl font-bold hover:bg-error/10 transition-all disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:bg-transparent"
+            onClick={handleRefund}
+            disabled={!address || refundBusy}
+          >
+            İade Talep Et
+          </button>
+          <StatusPill stage={refundTx.stage} />
+          <TxResult txHash={refundTx.txHash} errorMessage={refundTx.error?.message ?? null} />
         </div>
       </div>
     </section>

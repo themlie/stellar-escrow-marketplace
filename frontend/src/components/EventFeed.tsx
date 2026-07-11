@@ -1,15 +1,15 @@
 import { useEffect, useRef, useState } from "react";
 import { fetchContractEvents, getLatestLedgerSequence, type ContractEvent } from "../lib/events";
-import { PulseIcon, ExternalLinkIcon } from "./icons";
+import { MaterialIcon } from "./MaterialIcon";
 
 const POLL_MS = 6000;
 const MAX_EVENTS = 25;
 
-const EVENT_KIND: Record<string, string> = {
-  escrow_created: "escrow",
-  content_delivered: "escrow",
-  payment_released: "success",
-  refund_issued: "refund",
+const EVENT_COLOR: Record<string, string> = {
+  escrow_created: "bg-secondary",
+  content_delivered: "bg-secondary",
+  payment_released: "bg-tertiary",
+  refund_issued: "bg-error",
 };
 
 export function EventFeed() {
@@ -50,37 +50,46 @@ export function EventFeed() {
   }, []);
 
   return (
-    <section className="panel event-feed">
-      <div className="panel-head">
-        <div className="panel-head-title">
-          <div className="icon-badge">
-            <PulseIcon size={17} />
-          </div>
-          <h2>Canlı Event Akışı</h2>
+    <section className="glass-panel rounded-xl overflow-hidden">
+      <div className="px-6 py-4 border-b border-outline-variant flex justify-between items-center bg-surface-container-low">
+        <div className="flex items-center gap-3">
+          <MaterialIcon name={live ? "podcasts" : "pause"} className="text-tertiary" />
+          <h3 className="text-[20px] font-semibold text-on-surface">Canlı Event Akışı</h3>
         </div>
-        <span className={`live-badge ${live ? "live" : ""}`}>
-          <span className="dot" />
-          {live ? "CANLI" : "BAĞLANIYOR"}
-        </span>
+        <div className="flex items-center gap-2 px-3 py-1 bg-tertiary-container/30 border border-tertiary/20 rounded-full">
+          <div className={`w-2 h-2 bg-tertiary rounded-full ${live ? "animate-pulse" : ""}`} />
+          <span className="text-[10px] font-bold text-tertiary uppercase tracking-wider">{live ? "Canlı" : "Bağlanıyor"}</span>
+        </div>
       </div>
 
       {events.length === 0 ? (
-        <p className="event-empty">Henüz event yok. Bir işlem yapıldığında burada anında görünecek.</p>
+        <div className="h-64 flex flex-col items-center justify-center text-center p-8 gap-4">
+          <div className="w-16 h-16 rounded-full bg-surface-container flex items-center justify-center opacity-40">
+            <MaterialIcon name="history" className="text-[32px]" />
+          </div>
+          <p className="text-[14px] text-on-surface-variant max-w-sm">
+            Henüz event yok. Bir işlem yapıldığında burada anında görünecek.
+          </p>
+          <div className="w-full max-w-md h-1 bg-surface-container-highest rounded-full overflow-hidden">
+            <div className="h-full w-1/3 primary-gradient shimmer" />
+          </div>
+        </div>
       ) : (
-        <ul className="event-list">
+        <ul className="max-h-72 overflow-y-auto divide-y divide-outline-variant/60">
           {events.map((ev) => (
-            <li key={ev.id} className="event-item" data-kind={EVENT_KIND[ev.name] ?? "default"}>
-              <div>
-                <div className="event-name">{ev.name}</div>
-                <div className="event-meta">ledger #{ev.ledger}</div>
+            <li key={ev.id} className="flex items-center gap-3 px-6 py-3">
+              <span className={`w-2 h-2 rounded-full flex-shrink-0 ${EVENT_COLOR[ev.name] ?? "bg-primary"}`} />
+              <div className="min-w-0">
+                <div className="text-[13px] font-semibold text-on-surface">{ev.name}</div>
+                <div className="text-[11px] font-mono text-on-surface-variant">ledger #{ev.ledger}</div>
               </div>
               <a
-                className="event-tx"
                 href={`https://stellar.expert/explorer/testnet/tx/${ev.txHash}`}
                 target="_blank"
                 rel="noreferrer"
+                className="ml-auto flex items-center gap-1 text-[12px] text-primary hover:underline flex-shrink-0"
               >
-                tx <ExternalLinkIcon />
+                tx <span className="material-symbols-outlined text-[14px]">open_in_new</span>
               </a>
             </li>
           ))}

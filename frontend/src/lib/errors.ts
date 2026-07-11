@@ -44,6 +44,20 @@ function extractMessage(err: unknown): string {
   return String(err);
 }
 
+/**
+ * Soroban converts a contract's `Err(...)` return into a host-level trap, so
+ * failures surface as a raw "Error(Contract, #N)" dump inside SimulationFailed
+ * rather than as a decoded Result we could .isErr()/.unwrapErr() normally.
+ */
+function contractErrorFromTrapMessage(raw: string): AppError | null {
+  const match = raw.match(/Error\(Contract,\s*#(\d+)\)/);
+  if (!match) return null;
+  const code = Number(match[1]);
+  const info = (ContractErrors as Record<number, { message: string }>)[code];
+  if (!info) return null;
+  return { kind: "contract_error", message: CONTRACT_ERROR_MESSAGES[info.message] ?? info.message };
+}
+
 export function classifyError(err: unknown): AppError {
   if (err instanceof sdkContract.AssembledTransaction.Errors.UserRejected) {
     return { kind: "user_rejected", message: "İşlem cüzdan tarafından reddedildi." };
@@ -51,6 +65,8 @@ export function classifyError(err: unknown): AppError {
 
   if (err instanceof sdkContract.AssembledTransaction.Errors.SimulationFailed) {
     const msg = err.message || "";
+    const contractError = contractErrorFromTrapMessage(msg);
+    if (contractError) return contractError;
     if (/insufficient|underflow|underfunded|balance/i.test(msg)) {
       return {
         kind: "insufficient_balance",
@@ -62,6 +78,9 @@ export function classifyError(err: unknown): AppError {
 
   const raw = extractMessage(err);
   const lower = raw.toLowerCase();
+
+  const contractError = contractErrorFromTrapMessage(raw);
+  if (contractError) return contractError;
 
   if (
     lower.includes("closed the modal") ||

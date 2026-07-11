@@ -5,21 +5,6 @@ import { BuyerPanel } from "./components/BuyerPanel";
 import { EventFeed } from "./components/EventFeed";
 import { CONTRACT_ID } from "./lib/stellarClient";
 
-function NavLink({ href, children, active = false }: { href: string; children: string; active?: boolean }) {
-  return (
-    <a
-      href={href}
-      className={
-        active
-          ? "text-primary font-bold border-b-2 border-primary pb-1 transition-colors duration-200"
-          : "text-on-surface-variant font-medium hover:text-primary transition-colors duration-200"
-      }
-    >
-      {children}
-    </a>
-  );
-}
-
 function App() {
   const wallet = useWallet();
 
@@ -27,22 +12,12 @@ function App() {
     <div className="min-h-screen flex flex-col">
       <header className="sticky top-0 z-50 bg-surface/80 backdrop-blur-md border-b border-outline-variant">
         <div className="flex justify-between items-center px-6 py-4 w-full max-w-[1200px] mx-auto">
-          <div className="flex items-center gap-8">
-            <h1 className="text-[20px] font-bold text-on-surface">Stellar Marketplace</h1>
-            <nav className="hidden md:flex items-center gap-6">
-              <NavLink href="#market" active>
-                Market
-              </NavLink>
-              <NavLink href="#seller">Satıcı</NavLink>
-              <NavLink href="#buyer">Alıcı</NavLink>
-              <NavLink href="#events">Geçmiş</NavLink>
-            </nav>
-          </div>
+          <h1 className="text-[20px] font-bold text-on-surface">Stellar Marketplace</h1>
           <WalletBar wallet={wallet} />
         </div>
       </header>
 
-      <main id="market" className="flex-grow w-full max-w-[1200px] mx-auto px-6 py-8">
+      <main className="flex-grow w-full max-w-[1200px] mx-auto px-6 py-8">
         <div className="mb-8">
           <h2 className="text-[36px] leading-[1.2] tracking-[-0.02em] font-bold text-on-surface">Dashboard</h2>
           <p className="text-[14px] text-on-surface-variant mt-2">

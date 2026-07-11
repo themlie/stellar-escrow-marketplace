@@ -1,11 +1,16 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { getContractClient, xlmToStroops } from "../lib/stellarClient";
 import { sha256OfFile, sha256OfText, bufferToHex, hexToBuffer } from "../lib/hash";
 import { useTxRunner } from "../hooks/useTxRunner";
 import { StatusPill, TxResult } from "./StatusPill";
 import { MaterialIcon } from "./MaterialIcon";
 
-export function SellerPanel({ address }: { address: string | null }) {
+export interface DeliveryPrefill {
+  contentHash: string;
+  buyer: string;
+}
+
+export function SellerPanel({ address, prefill }: { address: string | null; prefill?: DeliveryPrefill | null }) {
   const [description, setDescription] = useState("");
   const [price, setPrice] = useState("10");
   const [file, setFile] = useState<File | null>(null);
@@ -13,6 +18,12 @@ export function SellerPanel({ address }: { address: string | null }) {
 
   const [buyerForDelivery, setBuyerForDelivery] = useState("");
   const [contentHashForDelivery, setContentHashForDelivery] = useState("");
+
+  useEffect(() => {
+    if (!prefill) return;
+    setContentHashForDelivery(prefill.contentHash);
+    setBuyerForDelivery(prefill.buyer);
+  }, [prefill]);
 
   const registerTx = useTxRunner<void>();
   const deliverTx = useTxRunner<void>();

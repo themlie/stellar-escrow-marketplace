@@ -12,7 +12,15 @@ const EVENT_COLOR: Record<string, string> = {
   refund_issued: "bg-error",
 };
 
-export function EventFeed() {
+function short(addr: string) {
+  return `${addr.slice(0, 4)}…${addr.slice(-4)}`;
+}
+
+export function EventFeed({
+  onUseForDelivery,
+}: {
+  onUseForDelivery?: (contentHash: string, buyer: string) => void;
+}) {
   const [events, setEvents] = useState<ContractEvent[]>([]);
   const [live, setLive] = useState(false);
   const cursorRef = useRef<number | null>(null);
@@ -75,19 +83,32 @@ export function EventFeed() {
           </div>
         </div>
       ) : (
-        <ul className="max-h-72 overflow-y-auto divide-y divide-outline-variant/60">
+        <ul className="max-h-80 overflow-y-auto divide-y divide-outline-variant/60">
           {events.map((ev) => (
             <li key={ev.id} className="flex items-center gap-3 px-6 py-3">
-              <span className={`w-2 h-2 rounded-full flex-shrink-0 ${EVENT_COLOR[ev.name] ?? "bg-primary"}`} />
-              <div className="min-w-0">
+              <span className={`w-2 h-2 rounded-full flex-shrink-0 mt-1 self-start ${EVENT_COLOR[ev.name] ?? "bg-primary"}`} />
+              <div className="min-w-0 flex-1">
                 <div className="text-[13px] font-semibold text-on-surface">{ev.name}</div>
                 <div className="text-[11px] font-mono text-on-surface-variant">ledger #{ev.ledger}</div>
+                {ev.name === "escrow_created" && ev.actor && ev.contentHashHex && (
+                  <div className="mt-1 text-[11px] font-mono text-on-surface-variant">
+                    Alıcı: <span className="text-on-surface">{short(ev.actor)}</span>
+                  </div>
+                )}
               </div>
+              {ev.name === "escrow_created" && ev.actor && ev.contentHashHex && onUseForDelivery && (
+                <button
+                  onClick={() => onUseForDelivery(ev.contentHashHex!, ev.actor!)}
+                  className="flex-shrink-0 text-[11px] font-semibold px-2.5 py-1.5 rounded-lg border border-primary text-primary hover:bg-primary/10 transition-colors"
+                >
+                  Teslim İşaretle
+                </button>
+              )}
               <a
                 href={`https://stellar.expert/explorer/testnet/tx/${ev.txHash}`}
                 target="_blank"
                 rel="noreferrer"
-                className="ml-auto flex items-center gap-1 text-[12px] text-primary hover:underline flex-shrink-0"
+                className="flex items-center gap-1 text-[12px] text-primary hover:underline flex-shrink-0"
               >
                 tx <span className="material-symbols-outlined text-[14px]">open_in_new</span>
               </a>

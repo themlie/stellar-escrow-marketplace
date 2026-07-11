@@ -1,12 +1,19 @@
+import { useState } from "react";
 import { useWallet } from "./hooks/useWallet";
 import { WalletBar } from "./components/WalletBar";
-import { SellerPanel } from "./components/SellerPanel";
+import { SellerPanel, type DeliveryPrefill } from "./components/SellerPanel";
 import { BuyerPanel } from "./components/BuyerPanel";
 import { EventFeed } from "./components/EventFeed";
 import { CONTRACT_ID } from "./lib/stellarClient";
 
 function App() {
   const wallet = useWallet();
+  const [deliveryPrefill, setDeliveryPrefill] = useState<DeliveryPrefill | null>(null);
+
+  function handleUseForDelivery(contentHash: string, buyer: string) {
+    setDeliveryPrefill({ contentHash, buyer });
+    document.getElementById("seller")?.scrollIntoView({ behavior: "smooth", block: "start" });
+  }
 
   return (
     <div className="min-h-screen flex flex-col">
@@ -44,7 +51,7 @@ function App() {
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
           <section id="seller">
-            <SellerPanel address={wallet.address} />
+            <SellerPanel address={wallet.address} prefill={deliveryPrefill} />
           </section>
           <section id="buyer">
             <BuyerPanel address={wallet.address} />
@@ -52,7 +59,7 @@ function App() {
         </div>
 
         <div id="events" className="mt-8">
-          <EventFeed />
+          <EventFeed onUseForDelivery={handleUseForDelivery} />
         </div>
       </main>
 

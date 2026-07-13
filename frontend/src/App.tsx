@@ -25,6 +25,11 @@ function App() {
     localStorage.setItem(ROLE_STORAGE_KEY, next);
   }
 
+  function resetRole() {
+    setRole(null);
+    localStorage.removeItem(ROLE_STORAGE_KEY);
+  }
+
   function handleUseForDelivery(contentHash: string, buyer: string) {
     setDeliveryPrefill({ contentHash, buyer });
     selectRole("seller");
@@ -69,7 +74,7 @@ function App() {
           </div>
           {wallet.address && role && (
             <button
-              onClick={() => setRole(null)}
+              onClick={resetRole}
               className="flex items-center gap-1.5 text-[12px] font-medium text-on-surface-variant hover:text-on-surface border border-outline-variant rounded-full px-3 py-1.5 transition-colors"
             >
               <MaterialIcon name={role === "seller" ? "store" : "shopping_cart"} className="text-[15px]" />

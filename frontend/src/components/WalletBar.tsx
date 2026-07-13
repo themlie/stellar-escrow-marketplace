@@ -17,7 +17,7 @@ export function WalletBar({ wallet }: { wallet: ReturnType<typeof useWallet> }) 
               className="hidden sm:flex items-center bg-surface-container-high px-4 py-2 rounded-full gap-2 border border-outline-variant"
               title={address}
             >
-              <div className="w-2 h-2 rounded-full bg-tertiary shadow-[0_0_8px_#4edea3]" />
+              <div className="w-2 h-2 rounded-full bg-tertiary shadow-[0_0_8px_rgba(22,163,74,0.45)]" />
               <span className="text-[12px] font-medium text-on-surface-variant font-mono">{short(address)}</span>
             </div>
             <button

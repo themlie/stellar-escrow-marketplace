@@ -16,18 +16,18 @@ function App() {
   const [role, setRole] = useState<Role | null>(null);
 
   useEffect(() => {
-    const saved = localStorage.getItem(ROLE_STORAGE_KEY);
+    const saved = sessionStorage.getItem(ROLE_STORAGE_KEY);
     if (saved === "seller" || saved === "buyer") setRole(saved);
   }, []);
 
   function selectRole(next: Role) {
     setRole(next);
-    localStorage.setItem(ROLE_STORAGE_KEY, next);
+    sessionStorage.setItem(ROLE_STORAGE_KEY, next);
   }
 
   function resetRole() {
     setRole(null);
-    localStorage.removeItem(ROLE_STORAGE_KEY);
+    sessionStorage.removeItem(ROLE_STORAGE_KEY);
   }
 
   function handleUseForDelivery(contentHash: string, buyer: string) {

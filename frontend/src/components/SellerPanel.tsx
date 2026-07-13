@@ -63,10 +63,10 @@ export function SellerPanel({ address, prefill }: { address: string | null; pref
   return (
     <section className="glass-panel rounded-xl p-6 md:p-8 flex flex-col gap-8 h-full">
       <div className="flex items-center gap-3">
-        <div className="bg-primary/20 p-2 rounded-lg">
+        <div className="bg-primary/10 border border-primary/20 p-2 rounded-full">
           <MaterialIcon name="store" className="text-primary" />
         </div>
-        <h3 className="text-[20px] font-semibold text-on-surface">Satıcı Paneli</h3>
+        <h3 className="font-serif text-[21px] font-semibold text-on-surface tracking-tight">Satıcı Paneli</h3>
       </div>
 
       {/* Step 1: register content */}
@@ -110,7 +110,7 @@ export function SellerPanel({ address, prefill }: { address: string | null; pref
           </div>
 
           <button
-            className="w-full primary-gradient text-white py-3 rounded-xl font-bold primary-glow transition-all disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:shadow-none"
+            className="font-serif w-full primary-gradient text-white py-3 rounded-xl font-semibold tracking-tight primary-glow transition-all disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:shadow-none"
             onClick={handleRegister}
             disabled={!address || registerBusy}
           >
@@ -154,7 +154,7 @@ export function SellerPanel({ address, prefill }: { address: string | null; pref
             </div>
 
             <button
-              className="w-full border border-primary text-primary py-3 rounded-xl font-bold hover:bg-primary/10 transition-all disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:bg-transparent"
+              className="font-serif w-full border border-primary text-primary py-3 rounded-xl font-semibold tracking-tight hover:bg-primary/10 transition-all disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:bg-transparent"
               onClick={handleMarkDelivered}
               disabled={!address || deliverBusy}
             >

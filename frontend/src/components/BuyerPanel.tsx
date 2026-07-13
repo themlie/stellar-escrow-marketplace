@@ -97,10 +97,10 @@ export function BuyerPanel({ address }: { address: string | null }) {
   return (
     <section className="glass-panel rounded-xl p-6 md:p-8 flex flex-col gap-8 h-full">
       <div className="flex items-center gap-3">
-        <div className="bg-secondary/20 p-2 rounded-lg">
+        <div className="bg-secondary/15 border border-secondary/25 p-2 rounded-full">
           <MaterialIcon name="shopping_cart" className="text-secondary" />
         </div>
-        <h3 className="text-[20px] font-semibold text-on-surface">Alıcı Paneli</h3>
+        <h3 className="font-serif text-[21px] font-semibold text-on-surface tracking-tight">Alıcı Paneli</h3>
       </div>
 
       {/* Step 1: browse & buy */}
@@ -138,7 +138,7 @@ export function BuyerPanel({ address }: { address: string | null }) {
                   <div className="text-[14px] font-bold text-primary whitespace-nowrap">{item.price} XLM</div>
                 </div>
                 <button
-                  className="w-full primary-gradient text-white py-2 rounded-lg text-[13px] font-bold primary-glow transition-all disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:shadow-none"
+                  className="font-serif w-full primary-gradient text-white py-2 rounded-lg text-[13px] font-semibold tracking-tight primary-glow transition-all disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:shadow-none"
                   onClick={() => handleBuy(item)}
                   disabled={!address || escrowBusy}
                 >
@@ -179,7 +179,7 @@ export function BuyerPanel({ address }: { address: string | null }) {
             </div>
           </div>
           <button
-            className="w-full bg-secondary-container text-on-secondary-container py-3 rounded-xl font-bold transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+            className="font-serif w-full bg-secondary-container text-on-secondary-container border border-secondary/25 py-3 rounded-xl font-semibold tracking-tight transition-all disabled:opacity-50 disabled:cursor-not-allowed"
             onClick={handleVerifyAndRelease}
             disabled={!address || !receivedFile || !contentHash}
           >
@@ -208,7 +208,7 @@ export function BuyerPanel({ address }: { address: string | null }) {
         </div>
         <div className="pl-10">
           <button
-            className="w-full border border-error/50 text-error py-3 rounded-xl font-bold hover:bg-error/10 transition-all disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:bg-transparent"
+            className="font-serif w-full border border-error/50 text-error py-3 rounded-xl font-semibold tracking-tight hover:bg-error/10 transition-all disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:bg-transparent"
             onClick={handleRefund}
             disabled={!address || refundBusy || !contentHash}
           >

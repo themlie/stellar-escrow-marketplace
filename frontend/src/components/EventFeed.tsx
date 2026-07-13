@@ -62,7 +62,7 @@ export function EventFeed({
       <div className="px-6 py-4 border-b border-outline-variant flex justify-between items-center bg-surface-container-low">
         <div className="flex items-center gap-3">
           <MaterialIcon name={live ? "podcasts" : "pause"} className="text-tertiary" />
-          <h3 className="text-[20px] font-semibold text-on-surface">Canlı Event Akışı</h3>
+          <h3 className="font-serif text-[21px] font-semibold text-on-surface tracking-tight">Canlı Event Akışı</h3>
         </div>
         <div className="flex items-center gap-2 px-3 py-1 bg-tertiary-container/30 border border-tertiary/20 rounded-full">
           <div className={`w-2 h-2 bg-tertiary rounded-full ${live ? "animate-pulse" : ""}`} />

@@ -5,7 +5,7 @@ export type Role = "seller" | "buyer";
 export function RoleGate({ onSelect }: { onSelect: (role: Role) => void }) {
   return (
     <div className="flex flex-col items-center justify-center text-center gap-6 py-16">
-      <h2 className="text-[28px] font-bold text-on-surface">Nasıl devam etmek istersiniz?</h2>
+      <h2 className="font-serif text-[28px] font-semibold text-on-surface tracking-tight">Nasıl devam etmek istersiniz?</h2>
       <p className="text-on-surface-variant text-[14px] max-w-md">
         Satıcıysanız içerik kaydedip teslimatları yönetin; alıcıysanız satılan içerikleri görüntüleyip satın alın.
       </p>
@@ -17,7 +17,7 @@ export function RoleGate({ onSelect }: { onSelect: (role: Role) => void }) {
           <div className="bg-primary/20 p-3 rounded-full">
             <MaterialIcon name="store" className="text-primary text-[28px]" />
           </div>
-          <span className="font-semibold text-on-surface">Satıcıyım</span>
+          <span className="font-serif font-semibold text-on-surface tracking-tight">Satıcıyım</span>
         </button>
         <button
           onClick={() => onSelect("buyer")}
@@ -26,7 +26,7 @@ export function RoleGate({ onSelect }: { onSelect: (role: Role) => void }) {
           <div className="bg-secondary/20 p-3 rounded-full">
             <MaterialIcon name="shopping_cart" className="text-secondary text-[28px]" />
           </div>
-          <span className="font-semibold text-on-surface">Alıcıyım</span>
+          <span className="font-serif font-semibold text-on-surface tracking-tight">Alıcıyım</span>
         </button>
       </div>
     </div>

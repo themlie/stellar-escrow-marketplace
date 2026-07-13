@@ -43,7 +43,7 @@ function App() {
       <header className="sticky top-0 z-50 bg-surface/80 backdrop-blur-md border-b border-outline-variant">
         <div className="flex justify-between items-center px-6 py-4 w-full max-w-[1200px] mx-auto">
           <div className="flex items-center gap-3">
-            <h1 className="text-[20px] font-bold text-on-surface">Stellar Marketplace</h1>
+            <h1 className="font-serif text-[20px] font-semibold text-on-surface tracking-tight">Stellar Marketplace</h1>
             <a
               href={`https://stellar.expert/explorer/testnet/contract/${CONTRACT_ID}`}
               target="_blank"
@@ -61,7 +61,7 @@ function App() {
       <main className="flex-grow w-full max-w-[1200px] mx-auto px-6 py-8">
         <div className="mb-8 flex items-start justify-between gap-4 flex-wrap">
           <div>
-            <h2 className="text-[36px] leading-[1.2] tracking-[-0.02em] font-bold text-on-surface">Dashboard</h2>
+            <h2 className="font-serif text-[34px] leading-[1.2] tracking-tight font-semibold text-on-surface">Dashboard</h2>
             <p className="text-[14px] text-on-surface-variant mt-2">
               Hash tabanlı güvenli dijital içerik satışı · Stellar Soroban
             </p>

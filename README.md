@@ -45,7 +45,9 @@ Then open `http://localhost:5173`.
 
 **Screenshot — wallet options available:**
 
-_Run `npm run dev`, click "Cüzdan Bağla", and save the resulting modal (Freighter/xBull/Albedo/LOBSTR/Rabet/Hana) as `screenshots/08-wallet-options.png`. This was verified working during development (all six wallets listed correctly) but could not be captured as an image file in the sandboxed dev environment used to build this feature._
+<p align="center">
+  <img src="screenshots/08-connect-wallet.png" alt="Connect Wallet modal listing Freighter, xBull, Albedo, LOBSTR, Rabet" width="700"/>
+</p>
 
 ## 🎯 Project Overview
 
@@ -56,56 +58,54 @@ Rise In is a blockchain solution that provides security and transparency in the 
 
 ## 💻 User Interface (Frontend) Flow
 
-Based on the web application interface, the seamless user journey involves:
+Screenshots below are taken from the actual running app (`frontend/`), signing real testnet transactions with Freighter.
 
-### 1. Register Content (Seller)
+### 1. Connect a wallet
 
-Sellers select a file locally (e.g., Ders5.pdf). The app generates a SHA-256 hash locally—meaning the file never leaves the user's computer—and registers the hash on-chain with a set price (e.g., 1 XLM) and description.
+The user connects with any supported wallet (Freighter, xBull, Albedo, LOBSTR, Rabet).
 
 <p align="center">
-  <img src="screenshots/01-register-content.png" alt="Register Content" width="800"/>
+  <img src="screenshots/08-connect-wallet.png" alt="Connect Wallet modal" width="800"/>
 </p>
 
-After registration, the content hash is generated and stored on-chain:
+### 2. Choose a role
+
+After connecting, the user picks **Seller** or **Buyer**. Each role gets its own focused screen instead of showing both flows at once.
 
 <p align="center">
-  <img src="screenshots/02-content-registered.png" alt="Content Registered" width="800"/>
+  <img src="screenshots/09-choose-role.png" alt="Seller / Buyer role selection screen" width="800"/>
 </p>
 
-### 2. Browse & Buy (Buyer)
+### 3. Register content (Seller)
 
-Buyers look up a content hash in the marketplace, view the details (description, price, seller), and click "Buy".
+The seller picks a file (or types a description), the app hashes it locally with SHA-256, and registers the hash on-chain with a price. Freighter prompts for signature.
 
 <p align="center">
-  <img src="screenshots/03-browse-content.png" alt="Browse Content" width="800"/>
+  <img src="screenshots/10-register-content.png" alt="Seller registering content, with Freighter confirmation" width="800"/>
 </p>
 
-This prompts a Freighter wallet confirmation to lock the funds in a smart contract escrow:
+### 4. Browse & buy (Buyer)
+
+The buyer sees a live catalog of everything registered on-chain (built from contract events, cross-checked with `get_content`) and buys with one click, which creates an escrow.
 
 <p align="center">
-  <img src="screenshots/04-wallet-confirmation.png" alt="Wallet Confirmation" width="400"/>
+  <img src="screenshots/11-buyer-purchase.png" alt="Buyer catalog and purchase, with Freighter confirmation" width="800"/>
 </p>
 
-After confirmation, the escrow is created and funds are locked:
+### 5. Mark as delivered (Seller)
+
+Once an escrow exists, the seller marks it delivered — the buyer's address is pulled straight from the `escrow_created` event feed, no manual copy-pasting.
 
 <p align="center">
-  <img src="screenshots/05-escrow-created.png" alt="Escrow Created" width="800"/>
+  <img src="screenshots/12-mark-delivered.png" alt="Seller marking content as delivered, with Freighter confirmation" width="800"/>
 </p>
 
-### 3. Mark as Delivered (Seller)
+### 6. Live event feed
 
-The seller shares the encrypted file off-chain (e.g., via Google Drive, Dropbox) and marks the escrow as delivered in the dashboard.
-
-<p align="center">
-  <img src="screenshots/06-mark-delivered.png" alt="Mark Delivered" width="800"/>
-</p>
-
-### 4. Verify & Release Payment (Buyer)
-
-The buyer drags and drops the received file into the app. The app hashes it locally, verifies that it matches the original on-chain hash, and securely releases the payment to the seller.
+Every step above shows up here in real time, polled directly from the contract's on-chain events.
 
 <p align="center">
-  <img src="screenshots/07-verify-release.png" alt="Verify and Release" width="800"/>
+  <img src="screenshots/13-live-event-feed.png" alt="Live event feed showing content_registered, escrow_created, content_delivered" width="800"/>
 </p>
 
 ## 🔐 Security Features

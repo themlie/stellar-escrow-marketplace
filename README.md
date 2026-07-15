@@ -1,12 +1,7 @@
-# Rise In - Secure Digital Content Marketplace
+# Rise In - Journey To Mastery 
 
 A smart contract running on Stellar Soroban that enables the secure sale of digital content through a hash-based content verification and escrow system.
 
-## 🎬 Demo Video
-
-> Click the button below to watch the full demo on Loom.
-
-[![Watch Demo on Loom](https://img.shields.io/badge/▶%20Watch%20Demo-Loom-purple?style=for-the-badge&logo=loom)](https://www.loom.com/share/5ac201f53c6d412d9f55ed3604c28129)
 
 ## 🟡 Level 2 Additions (Yellow Belt)
 

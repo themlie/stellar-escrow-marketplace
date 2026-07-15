@@ -59,32 +59,6 @@ pub type ContentHash = BytesN<32>;
 // Avalanche effect: 1 bit değişiklik → %50 hash değişir
 ```
 
-#### Off-Chain Encryption (Frontend)
-```javascript
-// Asimetrik şifreleme akışı
-async function encryptContent(content, buyerPublicKey) {
-    // 1. Random AES-256 key oluştur
-    const aesKey = crypto.getRandomValues(new Uint8Array(32));
-    
-    // 2. İçeriği AES ile şifrele
-    const encryptedContent = await crypto.subtle.encrypt(
-        { name: "AES-GCM", iv: iv },
-        aesKey,
-        content
-    );
-    
-    // 3. AES key'i alıcının public key'i ile şifrele (Ed25519)
-    const encryptedKey = await encryptWithPublicKey(aesKey, buyerPublicKey);
-    
-    return { encryptedContent, encryptedKey };
-}
-
-// Güvenlik garantileri:
-// ✅ Man-in-the-middle saldırısı engellenmiş
-// ✅ Sadece alıcı içeriği çözebilir
-// ✅ Forward secrecy (her işlem için yeni AES key)
-```
-
 ### 3. Ekonomik Güvenlik
 
 #### Escrow Mekanizması
@@ -156,20 +130,7 @@ buyer.require_auth();
 // Arbitrator sistemi ile çözüm
 ```
 
-### Risk 4: Man-in-the-Middle Attack
-**Risk**: Aradaki biri şifreli içeriği çalar.
-
-**Mitigasyon**:
-```javascript
-// Asimetrik şifreleme
-// Sadece alıcının private key'i ile çözülebilir
-const encryptedKey = await encryptWithPublicKey(aesKey, buyerPublicKey);
-
-// Stellar public key kullanımı
-// Blockchain'de doğrulanmış kimlik
-```
-
-### Risk 5: Replay Attack
+### Risk 4: Replay Attack
 **Risk**: Eski transaction tekrar gönderilir.
 
 **Mitigasyon**:
@@ -177,7 +138,7 @@ const encryptedKey = await encryptWithPublicKey(aesKey, buyerPublicKey);
 - Her transaction benzersiz sequence number içerir
 - Duplicate transaction otomatik reddedilir
 
-### Risk 6: Integer Overflow
+### Risk 5: Integer Overflow
 **Risk**: Toplam hacim overflow olabilir.
 
 **Mitigasyon**:
@@ -213,9 +174,6 @@ overflow-checks = true  // ← Panic on overflow
 
 ### Cryptography
 - [x] SHA-256 hash kullanımı
-- [x] Asimetrik şifreleme (off-chain)
-- [x] Random number generation (AES key)
-- [x] Key management
 
 ### Economic
 - [x] Escrow mekanizması
@@ -348,21 +306,7 @@ await contract.create_escrow(...).catch(() => {});
 
 ## 🚨 Güvenlik Açığı Bildirimi
 
-Güvenlik açığı bulursanız:
-
-1. **Hemen bildirin**: security@risein.io
-2. **Public disclosure yapmayın** (responsible disclosure)
-3. **Detaylı açıklama**: PoC, impact, severity
-4. **Ödül**: Bug bounty programımız var
-
-### Severity Levels
-
-| Level | Impact | Bounty |
-|-------|--------|--------|
-| Critical | Funds at risk | 10,000 XLM |
-| High | State corruption | 5,000 XLM |
-| Medium | DoS, logic errors | 1,000 XLM |
-| Low | Informational | 100 XLM |
+Bu bir eğitim/hackathon projesidir; resmi bir bug bounty programı veya audit süreci yoktur. Bir güvenlik açığı bulursanız lütfen [GitHub Issues](https://github.com/themlie/Rise-In-Contract/issues) üzerinden bildirin.
 
 ## 📚 Güvenlik Kaynakları
 
@@ -371,16 +315,6 @@ Güvenlik açığı bulursanız:
 - [Stellar Security Guide](https://developers.stellar.org/docs/learn/security)
 - [OWASP Smart Contract Top 10](https://owasp.org/www-project-smart-contract-top-10/)
 
-## ✅ Audit Status
-
-| Audit Type | Status | Date | Auditor |
-|------------|--------|------|---------|
-| Internal Code Review | ✅ Completed | 2024-01-10 | Rise In Team |
-| External Security Audit | 🔄 Pending | TBD | TBD |
-| Formal Verification | 📋 Planned | TBD | TBD |
-
 ---
 
-**Son Güncelleme**: 2024-01-15  
-**Güvenlik Versiyonu**: 1.0.0  
-**İletişim**: security@risein.io
+**Not**: Bu proje eğitim amaçlıdır; production kullanımı öncesinde bağımsız bir güvenlik denetiminden geçirilmelidir.

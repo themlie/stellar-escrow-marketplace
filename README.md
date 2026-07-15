@@ -494,8 +494,7 @@ MIT License - See the LICENSE file for details.
 ## 📞 Contact
 
 For any questions:
-- **GitHub Issues**: [rise-in-contract/issues](https://github.com/rise-in-contract/issues)
-- **Discord**: Stellar Developers
+- **GitHub Issues**: [themlie/Rise-In-Contract/issues](https://github.com/themlie/Rise-In-Contract/issues)
 
 ---
 

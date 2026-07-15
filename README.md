@@ -1,4 +1,4 @@
-# Stellar Marketplace - Secure Digital Content Marketplace
+# Rise In - Journey To Mastery
 
 A smart contract running on Stellar Soroban that enables the secure sale of digital content through a hash-based content verification and escrow system.
 
@@ -45,7 +45,7 @@ Then open `http://localhost:5173`.
 
 ## 🎯 Project Overview
 
-Stellar Marketplace is a blockchain solution that provides security and transparency in the sale of digital content (code, documents, data). Files are never uploaded to the blockchain; only their SHA-256 hashes are recorded. This ensures:- ✅ **Privacy**: Content is not visible on the blockchain
+Rise In is a blockchain solution that provides security and transparency in the sale of digital content (code, documents, data). Files are never uploaded to the blockchain; only their SHA-256 hashes are recorded. This ensures:- ✅ **Privacy**: Content is not visible on the blockchain
 - ✅ **Verification**: Content integrity is guaranteed via hashing
 - ✅ **Security**: Payment protection through an escrow system
 - ✅ **Transparency**: All transactions are recorded on the blockchain

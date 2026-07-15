@@ -1,4 +1,4 @@
-# 🔐 Stellar Marketplace - Güvenlik Dokümantasyonu
+# 🔐 Rise In - Güvenlik Dokümantasyonu
 
 ## Güvenlik Modeli
 

@@ -494,7 +494,7 @@ MIT License - See the LICENSE file for details.
 ## 📞 Contact
 
 For any questions:
-- **GitHub Issues**: [themlie/Rise-In-Contract/issues](https://github.com/themlie/Rise-In-Contract/issues)
+- **GitHub Issues**: [themlie/stellar-escrow-marketplace/issues](https://github.com/themlie/stellar-escrow-marketplace/issues)
 
 ---
 

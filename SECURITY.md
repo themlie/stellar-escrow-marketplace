@@ -306,7 +306,7 @@ await contract.create_escrow(...).catch(() => {});
 
 ## 🚨 Güvenlik Açığı Bildirimi
 
-Bu bir eğitim/hackathon projesidir; resmi bir bug bounty programı veya audit süreci yoktur. Bir güvenlik açığı bulursanız lütfen [GitHub Issues](https://github.com/themlie/Rise-In-Contract/issues) üzerinden bildirin.
+Bu bir eğitim/hackathon projesidir; resmi bir bug bounty programı veya audit süreci yoktur. Bir güvenlik açığı bulursanız lütfen [GitHub Issues](https://github.com/themlie/stellar-escrow-marketplace/issues) üzerinden bildirin.
 
 ## 📚 Güvenlik Kaynakları
 

@@ -1,4 +1,4 @@
-# Rise In - Teknik Mimari Dokümantasyonu
+# Stellar Marketplace - Teknik Mimari Dokümantasyonu
 
 ## 📐 Sistem Mimarisi
 
